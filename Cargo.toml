@@ -1,0 +1,7 @@
+[package]
+name = "rusty-modular-arithmetic"
+version = "0.1.0"
+authors = ["NyxCode <moritz.bischof1@gmail.com>"]
+
+[dependencies]
+glium = "*"
