@@ -1,5 +1,5 @@
 # rusty-modular-arithmetic
-###### A beautiful and animated multiplication tables on a circle
+###### Beautiful and animated multiplication tables on a circle
 `n` (*adjustable with `ctrl + mousewheel`*) equally spaced points are put on the circumference of a circle. 
 Now, a line is drawn from every point `p` to `(x * p) modulo n` (*adjust `x` with `mousewheel`*). 
 Crazy, mind-blowing and gorgeous shapes and patterns start forming once you start playing around with `x`.
