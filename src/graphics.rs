@@ -52,7 +52,7 @@ pub fn init_graphics() -> (EventsLoop, Display, Program, DrawParameters<'static>
     let (fragment_shader, line_width, blend) = if alpha_blend {
         eprintln!("Alpha-blending enabled");
         (
-            FRAGMENT_SHADER.replace("{alpha}", "0.3"),
+            FRAGMENT_SHADER.replace("{alpha}", "0.5"),
             Some(2.0),
             Blend::alpha_blending(),
         )
