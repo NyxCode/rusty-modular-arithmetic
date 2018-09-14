@@ -1,3 +1,5 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 #[macro_use]
 extern crate glium;
 
@@ -19,10 +21,10 @@ static FRAME_TIME: Duration = Duration::from_millis((1000. / 60.) as u64);
 fn main() {
     implement_vertex!(Vertex, position, color);
 
-    let (mut events_loop, display) = init_window();
-    let shader = load_line_shader(&display);
-    let uniforms = uniform!{};
-
+    let (mut events_loop, display, shader, parameters) = init_graphics();
+    let uniforms = uniform!(
+        alpha: 0.3_f32,
+    );
     let mut state = State::default();
 
     let (animation_timer_tx, animation_timer_rx) = mpsc::channel::<()>();
@@ -40,7 +42,7 @@ fn main() {
 
         if keep_running {
             if redraw {
-                draw_frame(&display, &shader, &uniforms, &state);
+                draw_frame(&display, &shader, &uniforms, &parameters, &state);
                 state.last_frame = Instant::now();
             }
             glutin::ControlFlow::Continue

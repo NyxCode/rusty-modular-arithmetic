@@ -1,4 +1,4 @@
-use std::time::{Instant, Duration};
+use std::time::Instant;
 
 #[derive(Debug, Clone)]
 pub enum Animation {
@@ -19,7 +19,7 @@ impl Default for State {
     fn default() -> Self {
         State {
             scale: 0.9,
-            divisions: 100,
+            divisions: 120,
             factor: 2.,
             current_animation: None,
             last_frame: Instant::now(),
@@ -45,9 +45,7 @@ impl State {
                 // mutate & redraw
                 MouseWheel {
                     delta, modifiers, ..
-                } => {
-                    (true, self.on_mouse_wheel(delta, modifiers))
-                }
+                } => (true, self.on_mouse_wheel(delta, modifiers)),
 
                 // mutate & redraw
                 KeyboardInput { input, .. } => {

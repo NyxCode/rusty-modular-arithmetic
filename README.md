@@ -29,3 +29,4 @@ git clone https://github.com/NyxCode/rusty-modular-arithmetic
 cd rusty-modular-arithmetic
 cargo run
 ```
+*note: On `Wayland`, run with `ALPHA_BLENDING=false cargo run`*
