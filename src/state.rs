@@ -1,3 +1,5 @@
+use std::time::{Instant, Duration};
+
 #[derive(Debug, Clone)]
 pub enum Animation {
     Factor(f32),
@@ -10,6 +12,7 @@ pub struct State {
     pub divisions: u16,
     pub factor: f32,
     pub current_animation: Option<Animation>,
+    pub last_frame: Instant,
 }
 
 impl Default for State {
@@ -19,6 +22,7 @@ impl Default for State {
             divisions: 100,
             factor: 2.,
             current_animation: None,
+            last_frame: Instant::now(),
         }
     }
 }
@@ -42,13 +46,12 @@ impl State {
                 MouseWheel {
                     delta, modifiers, ..
                 } => {
-                    self.on_mouse_wheel(delta, modifiers);
-                    (true, true)
+                    (true, self.on_mouse_wheel(delta, modifiers))
                 }
 
                 // mutate & redraw
                 KeyboardInput { input, .. } => {
-                    self.ok_key_pressed(&input, animation_timer);
+                    self.on_key_pressed(&input, animation_timer);
                     (true, true)
                 }
 
@@ -76,7 +79,11 @@ impl State {
         }
     }
 
-    fn manipulate(&mut self, factor: f32, modifiers: ModifiersState) {
+    fn manipulate(&mut self, factor: f32, modifiers: ModifiersState) -> bool {
+        if Instant::now().duration_since(self.last_frame) < ::FRAME_TIME {
+            return false;
+        }
+
         if modifiers.ctrl {
             let diff = if modifiers.shift { 10. } else { 1. } * factor;
 
@@ -86,9 +93,11 @@ impl State {
 
             self.factor += diff;
         }
+
+        true
     }
 
-    fn on_mouse_wheel(&mut self, delta: MouseScrollDelta, mods: ModifiersState) {
+    fn on_mouse_wheel(&mut self, delta: MouseScrollDelta, mods: ModifiersState) -> bool {
         use glutin::dpi::LogicalPosition;
 
         let amount = match delta {
@@ -96,17 +105,15 @@ impl State {
             PixelDelta(LogicalPosition { y, .. }) => y as f32,
         };
 
-        self.manipulate(amount, mods);
+        self.manipulate(amount, mods)
     }
 
-    fn ok_key_pressed(&mut self, input: &KeyboardInput, animation_timer: &Sender<()>) {
+    fn on_key_pressed(&mut self, input: &KeyboardInput, animation_timer: &Sender<()>) -> bool {
         use glutin::VirtualKeyCode::{Add, Down, Escape, Left, Right, Space, Subtract, Up, A};
 
         if input.state != Pressed {
-            return;
-        }
-
-        if let Some(key) = input.virtual_keycode {
+            false
+        } else if let Some(key) = input.virtual_keycode {
             match key {
                 Up | Right | Add => self.manipulate(1., input.modifiers),
                 Down | Left | Subtract => self.manipulate(-1., input.modifiers),
@@ -122,11 +129,12 @@ impl State {
                             let animation = if input.modifiers.ctrl {
                                 Animation::Divisions(speed)
                             } else {
-                                Animation::Factor(speed * 0.001)
+                                Animation::Factor(speed * 0.002)
                             };
                             self.current_animation = Some(animation);
                         }
-                    }
+                    };
+                    true
                 }
                 Escape => {
                     let current_animation = self.current_animation.clone();
@@ -134,9 +142,12 @@ impl State {
                         current_animation,
                         ..State::default()
                     };
+                    true
                 }
-                _ => (),
-            };
+                _ => false,
+            }
+        } else {
+            false
         }
     }
 }

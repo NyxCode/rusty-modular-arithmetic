@@ -11,7 +11,10 @@ use state::*;
 use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
+use std::time::Instant;
 use vertex::Vertex;
+
+static FRAME_TIME: Duration = Duration::from_millis((1000. / 60.) as u64);
 
 fn main() {
     implement_vertex!(Vertex, position, color);
@@ -19,7 +22,6 @@ fn main() {
     let (mut events_loop, display) = init_window();
     let shader = load_line_shader(&display);
     let uniforms = uniform!{};
-    let frame_time = Duration::from_millis((1000. / 60.) as u64);
 
     let mut state = State::default();
 
@@ -29,7 +31,7 @@ fn main() {
         animation_timer_rx.recv().unwrap();
         while animation_timer_rx.try_recv().is_err() {
             loop_proxy.wakeup().unwrap();
-            thread::sleep(frame_time);
+            thread::sleep(FRAME_TIME);
         }
     });
 
@@ -39,6 +41,7 @@ fn main() {
         if keep_running {
             if redraw {
                 draw_frame(&display, &shader, &uniforms, &state);
+                state.last_frame = Instant::now();
             }
             glutin::ControlFlow::Continue
         } else {
