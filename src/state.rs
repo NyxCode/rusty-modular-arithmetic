@@ -78,17 +78,16 @@ impl State {
     }
 
     fn manipulate(&mut self, factor: f32, modifiers: ModifiersState) -> bool {
-        if Instant::now().duration_since(self.last_frame) < ::FRAME_TIME {
+        if factor == 0. || Instant::now().duration_since(self.last_frame) < ::FRAME_TIME {
             return false;
         }
 
         if modifiers.ctrl {
             let diff = if modifiers.shift { 10. } else { 1. } * factor;
-
-            self.divisions = (f32::from(self.divisions) + diff).max(0.) as u16;
+            let divisions = f32::from(self.divisions) + diff;
+            self.divisions = divisions.max(0.) as u16;
         } else {
             let diff = if modifiers.shift { 0.2 } else { 0.01 } * factor;
-
             self.factor += diff;
         }
 
@@ -99,7 +98,7 @@ impl State {
         use glutin::dpi::LogicalPosition;
 
         let amount = match delta {
-            LineDelta(_, y) => y,
+            LineDelta(x, y) => y * 10.,
             PixelDelta(LogicalPosition { y, .. }) => y as f32,
         };
 

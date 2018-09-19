@@ -12,33 +12,47 @@ use vertex::Vertex;
 
 const FRAGMENT_SHADER: &str = r#"
     #version 140
+    #define PI 3.1415926535897932384626433832795
+    #define OFFSET 0.4
 
-    in vec3 vColor;
+    in vec2 pos;
+
     out vec4 f_color;
 
     void main() {
-        f_color = vec4(vColor, {alpha});
+        vec2 pos = pos * 0.5 * PI;
+
+        f_color = vec4(cos(pos.x) + (1 - pos.x) * OFFSET,
+                       sin(pos.x)  + (1 - pos.x) * OFFSET,
+                       cos(pos.y) + (1 - pos.y) * OFFSET, {alpha});
     }
 "#;
 
 const VERTEX_SHADER: &str = r#"
     #version 140
+    #define PI 3.1415926535897932384626433832795
 
     in vec2 position;
     in vec3 color;
 
-    out vec3 vColor;
+    //out vec3 vColor;
+    out vec2 pos;
 
     void main() {
+        float alpha = position.x * 0.5 * PI;
+        float beta = position.y * 0.5 * PI;
+        vec3 point = vec3(cos(alpha), sin(alpha), cos(beta));
+
+        //vColor = vec3(position, 0.0);
         gl_Position = vec4(position, 0.0, 1.0);
-        vColor = vec3((position.x + 1.0) / 2.0, (position.y + 1.0) / 2.0, 1.0);
+        pos = vec2(position.x, position.y);
     }
 "#;
 
 pub fn init_graphics() -> (EventsLoop, Display, Program, DrawParameters<'static>) {
     let events_loop = EventsLoop::new();
     let window = WindowBuilder::new()
-        .with_dimensions(LogicalSize::from((700, 700)))
+        .with_dimensions(LogicalSize::from((500, 500)))
         .with_title("rusty-modular-arithmetic")
         .with_resizable(false);
     let context = ContextBuilder::new();
