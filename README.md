@@ -4,6 +4,8 @@
 Now, a line is drawn from every point `p` to `(x * p) modulo n` (*adjust `x` with `mousewheel`*). 
 Crazy, mind-blowing and gorgeous shapes and patterns start forming once you start playing around with `x`.
 
+[Compiled binaries for Linux and Windows are available here](https://mega.nz/#F!uDoEXa5J!vAanF0nDEoLfqYOKYpVXMA)
+
   
 ###### `n = 100`, `x = 2`
 ![image](https://i.imgur.com/LVJMZs4.png)  
